@@ -83,29 +83,27 @@ password is strong or not. You can also directly access the entropy calculations
 
 ```text
 irb(main):004:0> checker = StrongPassword::StrengthChecker.new
-=> #<StrongPassword::StrengthChecker:0x00007f985509db30 @min_entropy=18, @use_dictionary=false, @min_word_length=4, @extra_dictionary_words=[]>
+=> #<StrongPassword::StrengthChecker:0x0000560b49a01360 @min_entropy=18, @use_dictionary=false, @min_word_length=4, @extra_dictionary_words=[], @every_dictionary_word=true>
 irb(main):005:0> checker.is_strong?("password")
 => false
 irb(main):006:0> checker.is_weak?("password")
 => true
 irb(main):007:0> checker = StrongPassword::StrengthChecker.new(min_entropy: 2)
-=> #<StrongPassword::StrengthChecker:0x00007f9855147bd0 @min_entropy=2, @use_dictionary=false, @min_word_length=4, @extra_dictionary_words=[]>
+=> #<StrongPassword::StrengthChecker:0x0000560b49a0ce40 @min_entropy=2, @use_dictionary=false, @min_word_length=4, @extra_dictionary_words=[], @every_dictionary_word=true>
 irb(main):008:0> checker.calculate_entropy("password")
 => 15.5
 irb(main):009:0> checker.is_strong?("password")
 => true
 irb(main):010:0> checker = StrongPassword::StrengthChecker.new(use_dictionary: true)
-=> #<StrongPassword::StrengthChecker:0x00007f98550ee008 @min_entropy=18, @use_dictionary=true, @min_word_length=4, @extra_dictionary_words=[]>
+=> #<StrongPassword::StrengthChecker:0x0000560b4960d3d0 @min_entropy=18, @use_dictionary=true, @min_word_length=4, @extra_dictionary_words=[], @every_dictionary_word=true>
 irb(main):011:0> checker.calculate_entropy("password")
 => 2
-irb(main):010:0> checker = StrongPassword::StrengthChecker.new(use_dictionary: true, every_dictionary_word: false)
+irb(main):012:0> checker.calculate_entropy("passwordqwerty")
+=> 3.5
+irb(main):013:0> checker = StrongPassword::StrengthChecker.new(use_dictionary: true, every_dictionary_word: false) # only removes the first dictionary word found - for backward compatibility with v0.0.8 and earlier
 => #<StrongPassword::StrengthChecker:0x00007f98550ee008 @min_entropy=18, @use_dictionary=true, @min_word_length=4, @extra_dictionary_words=[]>
-irb(main):011:0> checker.calculate_entropy("passwordquerty")
-=> X
-irb(main):010:0> checker = StrongPassword::StrengthChecker.new(use_dictionary: true)
-=> #<StrongPassword::StrengthChecker:0x00007f98550ee008 @min_entropy=18, @use_dictionary=true, @min_word_length=4, @extra_dictionary_words=[]>
-irb(main):011:0> checker.calculate_entropy("passwordquerty")
-=> 4
+irb(main):014:0> checker.calculate_entropy("passwordqwerty")
+=> 14
 ```
 
 ## Details
