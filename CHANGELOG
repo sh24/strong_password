@@ -1,3 +1,10 @@
+## v0.1.0
+* reduce the entropy scores when more than one dictionary word is found in a
+  password. The default behaviour is now stricter, and may break backward
+  compatibility if you are dependent on certain entropy scores, but the old
+  behaviour is still available by adding `every_dictionary_word: false` to the
+  configuration hash.
+
 ## v0.0.8
 This release breaks backwards compatibility if you are using the lib components
 directly. If you are using the ActiveModel validations in a Rails project then
