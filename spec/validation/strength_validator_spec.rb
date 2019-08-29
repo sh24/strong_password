@@ -21,6 +21,18 @@ class TestStrengthExtraWords < User
   validates :password, password_strength: {extra_dictionary_words: ['administrator'], use_dictionary: true}
 end
 
+class TestStrengthExtraWordsAsProc < User
+  validates :password, password_strength: {extra_dictionary_words: ->(_user) { ['administrator'] }, use_dictionary: true}
+end
+
+class TestStrengthExtraWordsAsSymbol < User
+  validates :password, password_strength: {extra_dictionary_words: :extra_words_array, use_dictionary: true}
+
+  def extra_words_array
+    ['administrator']
+  end
+end
+
 class TestBaseStrengthAlternative < User
   validates_password_strength :password
 end
@@ -32,6 +44,8 @@ module ActiveModel
       let(:weak_entropy) { TestStrengthWeakEntropy.new }
       let(:strong_entropy) { TestStrengthStrongEntropy.new }
       let(:extra_words) { TestStrengthExtraWords.new }
+      let(:extra_words_as_proc) { TestStrengthExtraWordsAsProc.new }
+      let(:extra_words_as_symbol) { TestStrengthExtraWordsAsSymbol.new }
       let(:alternative_usage) { TestBaseStrengthAlternative.new }
 
       describe 'validations' do
@@ -147,6 +161,13 @@ module ActiveModel
             # in our model, the same password is considered weak.
             extra_words.password = password
             expect(extra_words.valid?).to be_falsey
+            # Check that the extra words configuration can be passed as a proc
+            extra_words_as_proc.password = password
+            expect(extra_words_as_proc.valid?).to be_falsey
+            # Check that the extra words configuration can be passed as a symbol,
+            # which we then turn into a method call
+            extra_words_as_symbol.password = password
+            expect(extra_words_as_symbol.valid?).to be_falsey
           end
         end
       end

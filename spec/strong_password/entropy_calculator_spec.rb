@@ -33,6 +33,8 @@ module StrongPassword
       }.each do |password, bits|
         it "returns #{bits} for #{password.length} characters" do
           expect(subject.bits(password)).to eq(bits)
+          # With repeats_weakened = false, .calculate calls .bits
+          expect(subject.calculate(password, false)).to eq(bits)
         end
       end
     end
@@ -50,6 +52,9 @@ module StrongPassword
       }.each do |password, bits|
         it "returns #{bits} for #{password.length} characters" do
           expect(subject.bits_with_repeats_weakened(password)).to eq(bits)
+          # With repeats_weakened = true (default), .calculate calls
+          # the more secure .bits_with_repeats_weakened
+          expect(subject.calculate(password)).to eq(bits)
         end
       end
 

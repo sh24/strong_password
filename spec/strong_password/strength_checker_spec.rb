@@ -84,5 +84,14 @@ module StrongPassword
         strength_checker.calculate_entropy("$tr0NgP4s$w0rd91d£")
       end
     end
+
+    describe '#is_weak?' do
+      let(:strength_checker) { StrengthChecker.new }
+
+      it 'returns the opposite of is_strong?' do
+        allow(subject).to receive_messages(is_strong?: true)
+        expect(subject.is_weak?('password')).to be_falsey
+      end
+    end
   end
 end
