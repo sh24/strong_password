@@ -98,6 +98,14 @@ irb(main):010:0> checker = StrongPassword::StrengthChecker.new(use_dictionary: t
 => #<StrongPassword::StrengthChecker:0x00007f98550ee008 @min_entropy=18, @use_dictionary=true, @min_word_length=4, @extra_dictionary_words=[]>
 irb(main):011:0> checker.calculate_entropy("password")
 => 2
+irb(main):010:0> checker = StrongPassword::StrengthChecker.new(use_dictionary: true, every_dictionary_word: false)
+=> #<StrongPassword::StrengthChecker:0x00007f98550ee008 @min_entropy=18, @use_dictionary=true, @min_word_length=4, @extra_dictionary_words=[]>
+irb(main):011:0> checker.calculate_entropy("passwordquerty")
+=> X
+irb(main):010:0> checker = StrongPassword::StrengthChecker.new(use_dictionary: true)
+=> #<StrongPassword::StrengthChecker:0x00007f98550ee008 @min_entropy=18, @use_dictionary=true, @min_word_length=4, @extra_dictionary_words=[]>
+irb(main):011:0> checker.calculate_entropy("passwordquerty")
+=> 4
 ```
 
 ## Details
@@ -147,12 +155,6 @@ methods.  Any words supplied will be treated as though they were common dictiona
 things like your user's first name, last name, and email address as common dictionary words so they will be
 disallowed by the strength checker.
 
-## Todo
-
-1. Add a common password adjuster that basically works like the existing DictionaryAdjuster but does
-   not stop at the first found word.  Stopping at the first word make sense if you have a 300,000 word
-   dictionary of the English language but not so much when you're only talking about the 10,000 most
-   common passwords.
 
 ## Running the tests
 

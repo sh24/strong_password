@@ -17,6 +17,10 @@ class TestStrengthStrongEntropy < User
   validates :password, password_strength: {min_entropy: 40, use_dictionary: true}
 end
 
+class TestStrengthLegacyStrongEntropy < User
+  validates :password, password_strength: {min_entropy: 40, use_dictionary: true, every_dictionary_word: false}
+end
+
 class TestStrengthExtraWords < User
   validates :password, password_strength: {extra_dictionary_words: ['administrator'], use_dictionary: true}
 end
@@ -43,6 +47,7 @@ module ActiveModel
       let(:base_strength) { TestBaseStrength.new }
       let(:weak_entropy) { TestStrengthWeakEntropy.new }
       let(:strong_entropy) { TestStrengthStrongEntropy.new }
+      let(:legacy_strong_entropy) { TestStrengthLegacyStrongEntropy.new }
       let(:extra_words) { TestStrengthExtraWords.new }
       let(:extra_words_as_proc) { TestStrengthExtraWordsAsProc.new }
       let(:extra_words_as_symbol) { TestStrengthExtraWordsAsSymbol.new }
@@ -133,18 +138,44 @@ module ActiveModel
           end
 
           describe 'increased entropy' do
-            describe 'valid' do
+            describe 'invalid' do
               [
                 'p@ssw0fdsafsdafrd',
                 'b@se3ball rocks',
                 'f0bar plus baz',
-                'b@s3_9123as##!1?'
+                'b@s3_9123as##!1?',
+                'P45$wordQw3rtyBaseb4llAbCdEfGhIjKlMnOpQrStUvWxYz'
               ].each do |password|
                 it "'#{password}' should be invalid with increased entropy requirement" do
                   strong_entropy.password = password
                   strong_entropy.valid?
                   expect(strong_entropy.errors[:password]).to eq(["is too weak"])
                 end
+              end
+            end
+          end
+
+          describe 'increased entropy but only reducing first dictionary word' do
+            describe 'invalid' do
+              [
+                'p@ssw0fdsafsdafrd',
+                'b@se3ball rocks',
+                'f0bar plus baz',
+                'b@s3_9123as##!1?',
+              ].each do |password|
+                it "'#{password}' should be invalid with increased entropy requirement" do
+                  legacy_strong_entropy.password = password
+                  legacy_strong_entropy.valid?
+                  expect(legacy_strong_entropy.errors[:password]).to eq(["is too weak"])
+                end
+              end
+            end
+
+            describe 'valid' do
+              it "'P45$wordQw3rtyBaseb4llAbCdEfGhIjKlMnOpQrStUvWxYz' is valid" do
+                legacy_strong_entropy.password = 'P45$wordQw3rtyBaseb4llAbCdEfGhIjKlMnOpQrStUvWxYz'
+                legacy_strong_entropy.valid?
+                expect(legacy_strong_entropy.errors[:password]).to be_empty
               end
             end
           end

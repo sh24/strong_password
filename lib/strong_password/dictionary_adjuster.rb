@@ -1,7 +1,7 @@
-module StrongPassword   
+module StrongPassword
   class DictionaryAdjuster
-   COMMON_PASSWORDS = 
-    %w( password 123456 12345678 1234 qwerty 12345 dragon pussy baseball 
+   COMMON_PASSWORDS =
+    %w( password 123456 12345678 1234 qwerty 12345 dragon pussy baseball
         football letmein monkey 696969 abc123 mustang michael shadow master jennifer 111111
         2000 jordan superman harley 1234567 fuckme hunter fuckyou trustno1 ranger
         buster thomas tigger robert soccer fuck batman test pass killer hockey george
@@ -969,10 +969,12 @@ module StrongPassword
 
     attr_reader :min_entropy, :min_word_length, :extra_dictionary_words
 
-    def initialize(min_entropy: 18, min_word_length: 4, extra_dictionary_words: [])
+    def initialize(min_entropy: 18, min_word_length: 4, extra_dictionary_words: [],
+                   every_dictionary_word: true)
       @min_entropy = min_entropy
       @min_word_length = min_word_length
       @extra_dictionary_words = extra_dictionary_words
+      @every_dictionary_word = every_dictionary_word
     end
 
     def is_strong?(password)
@@ -993,8 +995,14 @@ module StrongPassword
       min_entropy = EntropyCalculator.calculate(base_password)
       # Process the passwords, while looking for possible matching words in the dictionary.
       PasswordVariants.all_variants(base_password).inject( min_entropy ) do |min_entropy, variant|
-        [ min_entropy, EntropyCalculator.calculate( variant.sub( dictionary_words, '*' ) ) ].min 
+        [ min_entropy, EntropyCalculator.calculate( censor(variant, dictionary_words)) ].min
       end
+    end
+
+    def censor(password, dictionary_words_regex)
+      return password.gsub( dictionary_words_regex, '*' ) if @every_dictionary_word
+
+      password.sub( dictionary_words_regex, '*' )
     end
 
     def dictionary_words

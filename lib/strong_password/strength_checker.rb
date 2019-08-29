@@ -4,13 +4,15 @@ module StrongPassword
     PASSWORD_LIMIT = 1_000
     EXTRA_WORDS_LIMIT = 1_000
 
-    attr_reader :min_entropy, :use_dictionary, :min_word_length, :extra_dictionary_words
+    attr_reader :min_entropy, :use_dictionary, :min_word_length, :extra_dictionary_words, :every_dictionary_word
 
-    def initialize(min_entropy: BASE_ENTROPY, use_dictionary: false, min_word_length: 4, extra_dictionary_words: [])
+    def initialize(min_entropy: BASE_ENTROPY, use_dictionary: false, min_word_length: 4,
+                   extra_dictionary_words: [], every_dictionary_word: true)
       @min_entropy = min_entropy
       @use_dictionary = use_dictionary
       @min_word_length = min_word_length
       @extra_dictionary_words = extra_dictionary_words
+      @every_dictionary_word = every_dictionary_word
     end
 
     def is_weak?(password)
@@ -51,6 +53,7 @@ module StrongPassword
       @dictionary_adjuster ||= DictionaryAdjuster.new(
         min_word_length: min_word_length,
         extra_dictionary_words: extra_dictionary_words,
+        every_dictionary_word: every_dictionary_word,
         min_entropy: min_entropy
       )
     end
